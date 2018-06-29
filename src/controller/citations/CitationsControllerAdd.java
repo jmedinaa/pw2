@@ -20,6 +20,7 @@ import model.entity.*;
 
 @SuppressWarnings("serial")
 public class CitationsControllerAdd extends HttpServlet{
+	
 	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 	User currentUser = UserServiceFactory.getUserService().getCurrentUser();

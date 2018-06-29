@@ -68,7 +68,7 @@
 	    </div>
 	    <div class="col-sm-10 text-left"> 
 	    <br>
-	      <h3 class="text-primary">Citation</h3>
+	      <h3 class="text-primary">Citations</h3>
 		  <table class="table table-bordered">
 		    <thead>
 		      <tr>

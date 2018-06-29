@@ -1,6 +1,7 @@
 package controller.resources;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.RequestDispatcher;
@@ -12,24 +13,66 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import controller.PMF;
 import model.entity.*;
 
 @SuppressWarnings("serial")
 public class ResourcesControllerView extends HttpServlet{
+	@SuppressWarnings("unchecked")
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+	User currentUser = UserServiceFactory.getUserService().getCurrentUser();
 	
-	public void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException  {
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		Key k = KeyFactory.createKey(Resource.class.getSimpleName(), new Long(request.getParameter("id")).longValue());
-		Resource resource = pm.getObjectById(Resource.class, k);
-		request.setAttribute("resource", resource);
-		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/Views/Resources/view.jsp");
-		dispatcher.forward(request, response);
-				
-		
+	if(currentUser==null){
+		RequestDispatcher dip =getServletContext().getRequestDispatcher("/WEB-INF/Views/Errors/deny.jsp");
+		dip.forward(req, resp);
 	}
+	else{
+		PersistenceManager pm =PMF.get().getPersistenceManager();
+		String query = "select from "+ model.entity.User.class.getName()+
+				" where email=='"+currentUser.getEmail()+"'"+
+				" && status==true";
+		List<model.entity.User>uSearch=(List<model.entity.User>)pm.newQuery(query).execute();
+		if(uSearch.isEmpty()){
+			RequestDispatcher dip =getServletContext().getRequestDispatcher("/WEB-INF/Views/Errors/deny.jsp");
+			dip.forward(req, resp);
+		}
+		else{
+			System.out.println(req.getServletPath());
+			
+			String query2 = "select from " + Resource.class.getName()+
+					" where url=='"+req.getServletPath()+"'"+
+					" && status==true";
+			List<Resource>rSearch=(List<Resource>)pm.newQuery(query2).execute();
+			if(rSearch.isEmpty()){
+				RequestDispatcher dip =getServletContext().getRequestDispatcher("/WEB-INF/Views/Errors/deny.jsp");
+				dip.forward(req, resp);
+			}
+			else{
+				String query3 = "select from "+Access.class.getName()+
+						" where idRole=="+uSearch.get(0).getIdRole()+
+						" && idResourse=="+rSearch.get(0).getId()+
+						" && status==true";
+				List<Access>aSearch=(List<Access>)pm.newQuery(query3).execute();
+				if(aSearch.isEmpty()){
+					RequestDispatcher dip =getServletContext().getRequestDispatcher("/WEB-INF/Views/Errors/deny.jsp");
+					dip.forward(req, resp);
+				}
+				else{
+					
+					Key k = KeyFactory.createKey(Resource.class.getSimpleName(), new Long(req.getParameter("id")).longValue());
+					Resource resource = pm.getObjectById(Resource.class, k);
+					req.setAttribute("resource", resource);
+					RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/Views/Resources/view.jsp");
+					dispatcher.forward(req, resp);
+				}
+				
+			}
+		}
+	}
+	}
+	
 
 }

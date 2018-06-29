@@ -73,7 +73,7 @@
 		      <tr>
 		        <th>Id</th>
 		        <th>Id Role / Name Role</th>
-		        <th>Id Resource / Url Resource</th>
+		        <th>Id Resource ----> Url Resource</th>
 		        <th>Date Created</th>
 		        <th>Status</th>
 		        <th>Actions</th>
@@ -91,7 +91,7 @@
 		      <tr>
 		        <td><%=access.getId() %></td>
 		        <td><%=access.getIdRole()%> / <%=access.getNameRole()%></td>
-		        <td><%=access.getIdResourse()%> /( <%=access.getUrlResource()%> )</td>
+		        <td><%=access.getIdResourse()%> ----> "<%=access.getUrlResource()%>"</td>
 		        <td><%=access.getCreated() %></td>
 		        <td><%=access.isStatus() %></td>
 		        <td>
